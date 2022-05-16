@@ -1,3 +1,5 @@
+#![warn(clippy::cargo)]
+
 mod format;
 mod ser;
 

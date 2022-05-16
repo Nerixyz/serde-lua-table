@@ -138,6 +138,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61ea8d54c77f8315140a05f4c7237403bf38b72704d031543aa1d16abbf517d1"
 
 [[package]]
+name = "serde-lua-table"
+version = "0.1.0"
+dependencies = [
+ "itoa",
+ "mlua",
+ "ryu",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.94"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -173,14 +184,3 @@ name = "unicode-xid"
 version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "957e51f3646910546462e67d5f7599b9e4fb8acdd304b087a6494730f9eebf04"
-
-[[package]]
-name = "xdlua"
-version = "0.1.0"
-dependencies = [
- "itoa",
- "mlua",
- "ryu",
- "serde",
- "thiserror",
-]

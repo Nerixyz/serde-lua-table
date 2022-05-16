@@ -1,12 +1,17 @@
 [package]
-name = "xdlua"
+name = "serde-lua-table"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Nerixyz <nerixdev@outlook.de>"]
+repository = "https://github.com/Nerixyz/serde-lua-table.git"
+description = "Serialize values to a lua representation."
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+keywords = ["lua", "serde", "serialization"]
+categories = ["encoding"]
 
 [dependencies]
-serde = { version = "1.0" }
+serde = "1.0"
 thiserror = "1.0"
 ryu = "1"
 itoa = "1"
