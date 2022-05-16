@@ -118,7 +118,7 @@ mod tests {
 
     #[test]
     fn it_woks() {
-        let file = std::fs::read("xd.lua").unwrap();
+        let file = std::fs::read("test_example.lua").unwrap();
 
         let lua = Lua::new();
         lua.load(&file).exec().unwrap();
