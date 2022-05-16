@@ -52,7 +52,7 @@ const UU: u8 = b'u'; // \x00...\x1F except the ones above
 const __: u8 = 0;
 
 // Lookup table of escape sequences. A value of b'x' at index i means that byte
-// i is escaped as "\x" in JSON. A value of 0 means that byte i is not escaped.
+// i is escaped as "\x" in Lua. A value of 0 means that byte i is not escaped.
 static ESCAPE: [u8; 256] = [
     //   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
     UU, UU, UU, UU, UU, UU, UU, UU, BB, TT, NN, UU, FF, RR, UU, UU, // 0

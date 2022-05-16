@@ -17,7 +17,7 @@ impl<W> Serializer<W>
 where
     W: io::Write,
 {
-    /// Creates a new JSON serializer.
+    /// Creates a new Lua serializer.
     #[inline]
     pub fn new(writer: W) -> Self {
         Serializer::with_formatter(writer, CompactFormatter)
@@ -28,7 +28,7 @@ impl<'a, W> Serializer<W, PrettyFormatter<'a>>
 where
     W: io::Write,
 {
-    /// Creates a new JSON pretty print serializer.
+    /// Creates a new Lua pretty print serializer.
     #[inline]
     pub fn pretty(writer: W) -> Self {
         Serializer::with_formatter(writer, PrettyFormatter::new())
@@ -40,7 +40,7 @@ where
     W: io::Write,
     F: Formatter,
 {
-    /// Creates a new JSON visitor whose output will be written to the writer
+    /// Creates a new Lua visitor whose output will be written to the writer
     /// specified.
     #[inline]
     pub fn with_formatter(writer: W, formatter: F) -> Self {

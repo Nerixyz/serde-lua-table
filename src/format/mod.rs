@@ -7,8 +7,8 @@ pub use compact::*;
 pub use pretty::*;
 use std::io::{self, Write};
 
-/// This trait abstracts away serializing the JSON control characters, which allows the user to
-/// optionally pretty print the JSON output.
+/// This trait abstracts away serializing the lua control characters, which allows the user to
+/// optionally pretty print the lua output.
 pub trait Formatter {
     /// Writes a `null` value to the specified writer.
     #[inline]
@@ -323,7 +323,7 @@ pub trait Formatter {
         Ok(())
     }
 
-    /// Writes a raw JSON fragment that doesn't need any escaping to the
+    /// Writes a raw Lua fragment that doesn't need any escaping to the
     /// specified writer.
     #[inline]
     fn write_raw_fragment<W>(&mut self, writer: &mut W, fragment: &str) -> io::Result<()>

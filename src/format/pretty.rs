@@ -1,7 +1,7 @@
 use super::Formatter;
 use std::io::{self, Write};
 
-/// This structure pretty prints a JSON value to make it human readable.
+/// This structure pretty prints a lua value to make it human readable.
 #[derive(Clone, Debug)]
 pub struct PrettyFormatter<'a> {
     current_indent: usize,
