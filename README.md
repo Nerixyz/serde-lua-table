@@ -7,7 +7,7 @@ It's basically `serde_json` but emitting lua tables.
 ## Usage
 
 ```toml
-serde-lua-table = { git = "https://github.com/Nerixyz/serde-lua-table.git", tag = "v0.1.0" }
+serde-lua-table = { git = "https://github.com/Nerixyz/serde-lua-table.git", tag = "v0.1.1" }
 ```
 
 ```rust
