@@ -1,43 +1,56 @@
-use std::error::Error;
-use std::fmt::{Display};
+mod compound;
+mod error;
+mod map_key_serializer;
+
+use crate::format::{format_escaped_str_contents, CompactFormatter, Formatter, PrettyFormatter};
+use compound::Compound;
+pub use error::*;
 use serde::Serialize;
 use std::io;
-use std::num::FpCategory;
-use serde::ser::StdError;
-use crate::format::{format_escaped_str_contents, Formatter};
 
-pub struct Serializer<W, F> {
+pub struct Serializer<W, F = CompactFormatter> {
     writer: W,
-    formatter: F
+    formatter: F,
 }
 
-#[derive(thiserror::Error, Debug)]
-pub enum SerError {
-    #[error("Io Error: {0}")]
-    Io(#[from] io::Error),
-    #[error("Custom error: {0}")]
-    Custom(String),
-}
-
-impl StdError for SerError {}
-
-impl serde::ser::Error for SerError {
-    fn custom<T>(msg: T) -> Self where T: Display {
-        Self::Custom(msg.to_string())
+impl<W> Serializer<W>
+where
+    W: io::Write,
+{
+    /// Creates a new JSON serializer.
+    #[inline]
+    pub fn new(writer: W) -> Self {
+        Serializer::with_formatter(writer, CompactFormatter)
     }
 }
 
-#[derive(Eq, PartialEq)]
-pub enum State {
-    Empty,
-    First,
-    Rest
+impl<'a, W> Serializer<W, PrettyFormatter<'a>>
+where
+    W: io::Write,
+{
+    /// Creates a new JSON pretty print serializer.
+    #[inline]
+    pub fn pretty(writer: W) -> Self {
+        Serializer::with_formatter(writer, PrettyFormatter::new())
+    }
 }
 
-pub enum Compound<'a, W, F> {
-    Map {
-        ser: &'a mut Serializer<W, F>,
-        state: State,
+impl<W, F> Serializer<W, F>
+where
+    W: io::Write,
+    F: Formatter,
+{
+    /// Creates a new JSON visitor whose output will be written to the writer
+    /// specified.
+    #[inline]
+    pub fn with_formatter(writer: W, formatter: F) -> Self {
+        Serializer { writer, formatter }
+    }
+
+    /// Unwrap the `Writer` from the `Serializer`.
+    #[inline]
+    pub fn into_inner(self) -> W {
+        self.writer
     }
 }
 
@@ -45,55 +58,77 @@ impl<'a, W: io::Write, F: Formatter> serde::Serializer for &'a mut Serializer<W,
     type Ok = ();
     type Error = SerError;
     type SerializeSeq = Compound<'a, W, F>;
-    type SerializeTuple = !;
-    type SerializeTupleStruct = !;
-    type SerializeTupleVariant = !;
+    type SerializeTuple = Compound<'a, W, F>;
+    type SerializeTupleStruct = Compound<'a, W, F>;
+    type SerializeTupleVariant = Compound<'a, W, F>;
     type SerializeMap = Compound<'a, W, F>;
     type SerializeStruct = Compound<'a, W, F>;
     type SerializeStructVariant = Compound<'a, W, F>;
 
     fn serialize_bool(self, v: bool) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_bool(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_bool(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_i8(self, v: i8) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_i8(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_i8(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_i16(self, v: i16) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_i16(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_i16(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_i32(self, v: i32) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_i32(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_i32(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_i64(self, v: i64) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_i64(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_i64(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_u8(self, v: u8) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_u8(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_u8(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_u16(self, v: u16) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_u16(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_u16(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_u32(self, v: u32) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_u32(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_u32(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_u64(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_u64(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_f32(self, v: f32) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_f32(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_f32(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_f64(self, v: f64) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_f64(&mut self.writer, v).map_err(SerError::Io)
+        self.formatter
+            .write_f64(&mut self.writer, v)
+            .map_err(SerError::Io)
     }
 
     fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
@@ -103,7 +138,7 @@ impl<'a, W: io::Write, F: Formatter> serde::Serializer for &'a mut Serializer<W,
     }
 
     fn serialize_str(self, v: &str) -> Result<Self::Ok, Self::Error> {
-        format_escaped_str_contents(&mut self.writer, &mut self.formatter, v).map_err(SerError::Io)
+        format_escaped_str(&mut self.writer, &mut self.formatter, v).map_err(SerError::Io)
     }
 
     fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok, Self::Error> {
@@ -127,11 +162,15 @@ impl<'a, W: io::Write, F: Formatter> serde::Serializer for &'a mut Serializer<W,
     }
 
     fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_null(&mut self.writer).map_err(SerError::Io)
+        self.formatter
+            .write_null(&mut self.writer)
+            .map_err(SerError::Io)
     }
 
-    fn serialize_unit_struct(self, name: &'static str) -> Result<Self::Ok, Self::Error> {
-        self.formatter.write_null(&mut self.writer).map_err(SerError::Io)
+    fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
+        self.formatter
+            .write_null(&mut self.writer)
+            .map_err(SerError::Io)
     }
 
     fn serialize_unit_variant(
@@ -179,9 +218,9 @@ impl<'a, W: io::Write, F: Formatter> serde::Serializer for &'a mut Serializer<W,
         self.formatter.begin_array(&mut self.writer)?;
         if len == Some(0) {
             self.formatter.end_array(&mut self.writer)?;
-            Ok(Compound::Map {ser: self, state: State::Empty})
+            Ok(Compound::empty(self))
         } else {
-            Ok(Compound::Map {ser: self, state: State::First})
+            Ok(Compound::first(self))
         }
     }
 
@@ -199,34 +238,60 @@ impl<'a, W: io::Write, F: Formatter> serde::Serializer for &'a mut Serializer<W,
 
     fn serialize_tuple_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
+        _name: &'static str,
+        _variant_index: u32,
         variant: &'static str,
         len: usize,
     ) -> Result<Self::SerializeTupleVariant, Self::Error> {
         self.formatter.begin_object(&mut self.writer)?;
         self.formatter.begin_object_key(&mut self.writer, true)?;
+        self.serialize_str(variant)?;
+        self.formatter.end_object_key(&mut self.writer)?;
+        self.formatter.begin_object_value(&mut self.writer)?;
+        self.serialize_seq(Some(len))
     }
 
     fn serialize_map(self, len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
-        todo!()
+        self.formatter.begin_object(&mut self.writer)?;
+        if len == Some(0) {
+            self.formatter.end_object(&mut self.writer)?;
+            Ok(Compound::empty(self))
+        } else {
+            Ok(Compound::first(self))
+        }
     }
 
     fn serialize_struct(
         self,
-        name: &'static str,
+        _name: &'static str,
         len: usize,
     ) -> Result<Self::SerializeStruct, Self::Error> {
-        todo!()
+        self.serialize_map(Some(len))
     }
 
     fn serialize_struct_variant(
         self,
-        name: &'static str,
-        variant_index: u32,
+        _name: &'static str,
+        _variant_index: u32,
         variant: &'static str,
         len: usize,
     ) -> Result<Self::SerializeStructVariant, Self::Error> {
-        todo!()
+        self.formatter.begin_object(&mut self.writer)?;
+        self.formatter.begin_object_key(&mut self.writer, true)?;
+        self.serialize_str(variant)?;
+        self.formatter.end_object_key(&mut self.writer)?;
+        self.formatter.begin_object_value(&mut self.writer)?;
+        self.serialize_map(Some(len))
     }
+}
+
+fn format_escaped_str<W, F>(writer: &mut W, formatter: &mut F, value: &str) -> io::Result<()>
+where
+    W: ?Sized + io::Write,
+    F: ?Sized + Formatter,
+{
+    formatter.begin_string(writer)?;
+    format_escaped_str_contents(writer, formatter, value)?;
+    formatter.end_string(writer)?;
+    Ok(())
 }

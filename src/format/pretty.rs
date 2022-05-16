@@ -1,4 +1,4 @@
-use super::{Formatter, CharEscape};
+use super::Formatter;
 use std::io::{self, Write};
 
 /// This structure pretty prints a JSON value to make it human readable.
@@ -39,7 +39,7 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     {
         self.current_indent += 1;
         self.has_value = false;
-        writer.write_all(b"[")
+        writer.write_all(b"{")
     }
 
     #[inline]
@@ -54,7 +54,7 @@ impl<'a> Formatter for PrettyFormatter<'a> {
             indent(writer, self.current_indent, self.indent)?;
         }
 
-        writer.write_all(b"]")
+        writer.write_all(b"}")
     }
 
     #[inline]
@@ -115,7 +115,16 @@ impl<'a> Formatter for PrettyFormatter<'a> {
         } else {
             writer.write_all(b",\n")?;
         }
-        indent(writer, self.current_indent, self.indent)
+        indent(writer, self.current_indent, self.indent)?;
+        writer.write_all(b"[")
+    }
+
+    #[inline]
+    fn end_object_key<W>(&mut self, writer: &mut W) -> io::Result<()>
+    where
+        W: ?Sized + Write,
+    {
+        writer.write_all(b"] ")
     }
 
     #[inline]
@@ -123,7 +132,7 @@ impl<'a> Formatter for PrettyFormatter<'a> {
     where
         W: ?Sized + Write,
     {
-        writer.write_all(b": ")
+        writer.write_all(b"= ")
     }
 
     #[inline]
@@ -134,17 +143,6 @@ impl<'a> Formatter for PrettyFormatter<'a> {
         self.has_value = true;
         Ok(())
     }
-}
-
-fn format_escaped_str<W, F>(writer: &mut W, formatter: &mut F, value: &str) -> io::Result<()>
-where
-    W: ?Sized + Write,
-    F: ?Sized + Formatter,
-{
-    formatter.begin_string(writer)?;
-    format_escaped_str_contents(writer, formatter, value)?;
-    formatter.end_string(writer)?;
-    Ok(())
 }
 
 fn indent<W>(wr: &mut W, n: usize, s: &[u8]) -> io::Result<()>

@@ -2,9 +2,9 @@ mod character_escape;
 mod compact;
 mod pretty;
 
+pub use character_escape::*;
 pub use compact::*;
 pub use pretty::*;
-pub use character_escape::*;
 use std::io::{self, Write};
 
 /// This trait abstracts away serializing the JSON control characters, which allows the user to
@@ -223,7 +223,7 @@ pub trait Formatter {
     where
         W: ?Sized + Write,
     {
-        writer.write_all(b"[")
+        writer.write_all(b"{")
     }
 
     /// Called after every array.  Writes a `]` to the specified
@@ -233,7 +233,7 @@ pub trait Formatter {
     where
         W: ?Sized + Write,
     {
-        writer.write_all(b"]")
+        writer.write_all(b"}")
     }
 
     /// Called before every array value.  Writes a `,` if needed to
@@ -286,9 +286,9 @@ pub trait Formatter {
         W: ?Sized + Write,
     {
         if first {
-            Ok(())
+            writer.write_all(b"[")
         } else {
-            writer.write_all(b",")
+            writer.write_all(b",[")
         }
     }
 
@@ -296,11 +296,11 @@ pub trait Formatter {
     /// specified writer by either this method or
     /// `begin_object_value`.
     #[inline]
-    fn end_object_key<W>(&mut self, _writer: &mut W) -> io::Result<()>
+    fn end_object_key<W>(&mut self, writer: &mut W) -> io::Result<()>
     where
         W: ?Sized + Write,
     {
-        Ok(())
+        writer.write_all(b"]")
     }
 
     /// Called before every object value.  A `:` should be written to
@@ -311,7 +311,7 @@ pub trait Formatter {
     where
         W: ?Sized + Write,
     {
-        writer.write_all(b":")
+        writer.write_all(b"=")
     }
 
     /// Called after every object value.
