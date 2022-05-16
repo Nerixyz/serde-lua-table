@@ -10,13 +10,13 @@ use std::io::{self, Write};
 /// This trait abstracts away serializing the lua control characters, which allows the user to
 /// optionally pretty print the lua output.
 pub trait Formatter {
-    /// Writes a `null` value to the specified writer.
+    /// Writes a `nil` value to the specified writer.
     #[inline]
     fn write_null<W>(&mut self, writer: &mut W) -> io::Result<()>
     where
         W: ?Sized + Write,
     {
-        writer.write_all(b"null")
+        writer.write_all(b"nil")
     }
 
     /// Writes a `true` or `false` value to the specified writer.
@@ -216,7 +216,7 @@ pub trait Formatter {
         writer.write_all(s)
     }
 
-    /// Called before every array.  Writes a `[` to the specified
+    /// Called before every array.  Writes a `{` to the specified
     /// writer.
     #[inline]
     fn begin_array<W>(&mut self, writer: &mut W) -> io::Result<()>
@@ -226,7 +226,7 @@ pub trait Formatter {
         writer.write_all(b"{")
     }
 
-    /// Called after every array.  Writes a `]` to the specified
+    /// Called after every array.  Writes a `}` to the specified
     /// writer.
     #[inline]
     fn end_array<W>(&mut self, writer: &mut W) -> io::Result<()>
@@ -292,7 +292,7 @@ pub trait Formatter {
         }
     }
 
-    /// Called after every object key.  A `:` should be written to the
+    /// Called after every object key.  A `=` should be written to the
     /// specified writer by either this method or
     /// `begin_object_value`.
     #[inline]
@@ -303,7 +303,7 @@ pub trait Formatter {
         writer.write_all(b"]")
     }
 
-    /// Called before every object value.  A `:` should be written to
+    /// Called before every object value.  A `=` should be written to
     /// the specified writer by either this method or
     /// `end_object_key`.
     #[inline]
