@@ -10,6 +10,10 @@ readme = "README.md"
 keywords = ["lua", "serde", "serialization"]
 categories = ["encoding"]
 
+[lib]
+name = "serde_lua_table"
+path = "src/lib.rs"
+
 [dependencies]
 serde = "1.0"
 thiserror = "1.0"
