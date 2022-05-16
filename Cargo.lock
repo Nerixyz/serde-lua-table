@@ -139,7 +139,7 @@ checksum = "61ea8d54c77f8315140a05f4c7237403bf38b72704d031543aa1d16abbf517d1"
 
 [[package]]
 name = "serde-lua-table"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "itoa",
  "mlua",
